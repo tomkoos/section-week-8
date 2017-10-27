@@ -25,34 +25,19 @@ def params_unique_combination(baseurl, params_d, private_keys=["api_key"]):
             res.append("{}-{}".format(k, params_d[k]))
     return baseurl + "_".join(res)
 
-def search_flickr_by_tags(tags):
+def search_flickr(diction):
     if not FLICKR_API_KEY:
         raise Exception('Flickr API Key is missing!')
 
     baseurl = "https://api.flickr.com/services/rest/"
     params_diction = {
-        "method": "flickr.photos.search",
         "format": "json",
         "api_key": FLICKR_API_KEY,
-        "tags": tags,
-        "per_page": 10,
         "nojsoncallback": 1
     }
-
-def search_flickr(method, per_page, photo_id=None, tags=None):
-    if not FLICKR_API_KEY:
-        raise Exception('Flickr API Key is missing!')
-
-    baseurl = "https://api.flickr.com/services/rest/"
-    params_diction = {
-        "method": method,
-        "format": "json",
-        "api_key": FLICKR_API_KEY,
-        "tags": tags,
-        "per_page": per_page,
-        "nojsoncallback": 1
-    }
-
+    for key in diction:
+        params_diction[key] = diction[key]
+    
     unique_ident = params_unique_combination(baseurl,params_diction)
     if unique_ident in CACHE_DICTION:
         return CACHE_DICTION[unique_ident]
@@ -79,7 +64,10 @@ CACHE_DICTION = load_cache_json()
 if DEBUG:
     print(CACHE_DICTION)
 
-results = search_flickr(method="flickr.photos.search", per_page=10, tags='sunset summer')
+diction = {"method": "flickr.photos.search",
+           "tags": "sunset summer",
+           "per_page": 10}
+results = search_flickr(diction)
 
 photos_list = []
 for r in results['photos']['photo']:
@@ -95,5 +83,3 @@ for photo in photos_list:
 
     # if you get encoding error, try this
     # print(str(photo).encode('utf-8'))
-
-print()
