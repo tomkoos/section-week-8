@@ -39,6 +39,20 @@ def search_flickr_by_tags(tags):
         "nojsoncallback": 1
     }
 
+def search_flickr(method, per_page, photo_id=None, tags=None):
+    if not FLICKR_API_KEY:
+        raise Exception('Flickr API Key is missing!')
+
+    baseurl = "https://api.flickr.com/services/rest/"
+    params_diction = {
+        "method": method,
+        "format": "json",
+        "api_key": FLICKR_API_KEY,
+        "tags": tags,
+        "per_page": per_page,
+        "nojsoncallback": 1
+    }
+
     unique_ident = params_unique_combination(baseurl,params_diction)
     if unique_ident in CACHE_DICTION:
         return CACHE_DICTION[unique_ident]
@@ -65,7 +79,7 @@ CACHE_DICTION = load_cache_json()
 if DEBUG:
     print(CACHE_DICTION)
 
-results = search_flickr_by_tags('sunset summer')
+results = search_flickr(method="flickr.photos.search", per_page=10, tags='sunset summer')
 
 photos_list = []
 for r in results['photos']['photo']:
