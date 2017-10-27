@@ -52,12 +52,13 @@ def search_flickr(diction):
 
 class Photo:
     def __init__(self, photo_dict):
-        self.title = photo_dict['title']
+        self.title = photo_dict['title']['_content']
         self.id = photo_dict['id']
-        self.owner = photo_dict['owner']
+        self.owner = photo_dict['owner']['nsid']
+        self.owner_username = photo_dict['owner']['username']
 
     def __str__(self):
-        return '{0} by {1}'.format(self.title, self.owner)
+        return '{0} by {1}'.format(self.title, self.owner_username)
 
 
 CACHE_DICTION = load_cache_json()
@@ -71,7 +72,12 @@ results = search_flickr(diction)
 
 photos_list = []
 for r in results['photos']['photo']:
-    photos_list.append(Photo(r))
+    photo_id = r['id']
+    photo_result = search_flickr({
+            'method': 'flickr.photos.getInfo',
+            'photo_id': photo_id
+        })
+    photos_list.append(Photo(photo_result['photo']))
 
 print()
 print("= compare these outputs = >> ")
